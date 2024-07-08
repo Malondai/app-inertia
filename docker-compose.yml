@@ -1,0 +1,35 @@
+services:
+    # App
+    app-inertia:
+        build: ./
+        image: php:8.2
+        container_name: app-inertia
+        environment:
+            SERVICE_NAME: app-inertia
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        ports:
+            - "8092:22"
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./docker/php/php.ini:/usr/local/etc/php/conf.d//php.ini
+        networks:
+            - inertia-network
+    # Webserver
+    nginx-inertia:
+        image: nginx:latest
+        container_name: nginx-inertia
+        working_dir: /application
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "8088:80"
+        networks:
+            - inertia-network
+        depends_on:
+            - app-inertia
+networks:
+    inertia-network:
+        driver: bridge
